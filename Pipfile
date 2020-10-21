@@ -1,0 +1,27 @@
+[[source]]
+name = "pypi"
+url = "https://pypi.org/simple"
+verify_ssl = true
+
+[dev-packages]
+pylint = "*"
+pytest = "*"
+pytest-pythonpath = "*"
+ipython = "*"
+
+[packages]
+openpyxl = "*"
+xlsxwriter = '*'
+importlib-metadata = "*"
+coverage = "*"
+xlrd = "*"
+pytz = "*"
+boto3 = "*"
+gunicorn = "*"
+click = "*"
+jmespath = "*"
+requests = "*"
+faker = "*"
+
+[requires]
+python_version = "3.7"
