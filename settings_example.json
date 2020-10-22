@@ -1,0 +1,19 @@
+{
+  "environments": {
+    "dev": {
+      "host": "https://success-gateway.geniusplazadev.com"
+    },
+    "staging": {
+      "host": "https://success-gateway-v1.geniusstaging.com"
+    },
+    "production": {
+      "host": "https://success-gateway-v1.geniusplaza.com"
+    },
+    "local": {
+      "host": "http://localhost:8000"
+    }
+  },
+  "username": "fill username for specific environment",
+  "password": "fill password for specific environment",
+  "env": "dev"
+}
