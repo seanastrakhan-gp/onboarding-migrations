@@ -44,12 +44,12 @@ def bulk_upload_staff_district(payload, token):
     url = f"{ENV_HOST}/classes/district_staff/bulk/"
     auth_header = {'Authorization': f"Bearer {token}"}
     generated_file = generate_csv(payload, STAFF_BULK_PARAMS)
-    response = requests.post(url, files=dict(roster=generated_file), headers=auth_header)
-    return response
+    response = requests.post(url, files=dict(roster=('roster.csv', generated_file)), headers=auth_header)
+    return response.json()
 
 def bulk_upload_staff_principal(payload, token, org_id):
     url = f"{ENV_HOST}/classes/organization/{org_id}/staff/bulk/"
     auth_header = {'Authorization': f"Bearer {token}"}
     generated_file = generate_csv(payload, STAFF_BULK_PARAMS)
-    response = requests.post(url, files=dict(roster=generated_file), headers=auth_header)
+    response = requests.post(url, files=dict(roster=('roster.csv', generated_file)), headers=auth_header)
     return response

@@ -1,6 +1,6 @@
 import click
 import os
-from settings import ENVIRONMENTS, ENV_HOST
+from settings import ENVIRONMENTS
 from application.services.authenticate import authenticate
 from application.services.create_user import create_staff
 from .user_factory import generate_users
@@ -24,7 +24,6 @@ def seed_users(environment, user_count, org_id):
         result = create_staff(json_payload, auth_token, environment_url, org_id)
         # Figure out what needs to happen above so user creation 
         click.echo(f'Result: {result}')
-
     click.echo(f'Process complete')
 
 if __name__ == '__main__':

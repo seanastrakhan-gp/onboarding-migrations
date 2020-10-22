@@ -10,10 +10,10 @@
       "host": "https://success-gateway-v1.geniusplaza.com"
     },
     "local": {
-      "host": "http://localhost:8000"
+      "host": "http://localhost:8089"
     }
   },
   "username": "vladkochergin",
   "password": "12345678",
-  "env": "dev"
+  "env": "local"
 }

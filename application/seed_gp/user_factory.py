@@ -16,7 +16,7 @@ class User:
   @property
   def email(self):
     #TODO - I don't think this line below is working
-    return f"{self.first_name}{index}@mailinator.com"
+    return f"{self.first_name}{self.index}@mailinator.com"
 
 def generate_users(count):
   TEACHER_GROUP_ID = 3
