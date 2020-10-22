@@ -6,6 +6,6 @@ def authenticate(username, password, environment_url):
     response = requests.post(auth_url, json={'username': username, 'password': password})
 
     if response.status_code == 200:
-        token = search('refresh_token', response.json())
+        token = search('access_token', response.json())
         return token
         

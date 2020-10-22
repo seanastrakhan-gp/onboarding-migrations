@@ -15,13 +15,10 @@ class User:
 
   @property
   def email(self):
-    return f"{self.first_name}{index}@mailanator.com"
-
-  # Convert Object to JSON
-  def toJSON(self):
-      return json.dumps(self, default=lambda o: o.__dict__, 
-          sort_keys=True, indent=4)
+    #TODO - I don't think this line below is working
+    return f"{self.first_name}{index}@mailinator.com"
 
 def generate_users(count):
-  users = [User(index) for index in range(count)]
+  TEACHER_GROUP_ID = 3
+  users = [User(index, staff_role_id=TEACHER_GROUP_ID) for index in range(count)]
   return users
