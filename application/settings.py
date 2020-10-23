@@ -1,7 +1,10 @@
 from application.utils.json import parse_json_file
 import logging
 import time
-#logging.basicConfig(filename=f'{int(time.time())}.log', encoding='utf-8', level=logging.DEBUG)
+
+LOG_FORMAT = '%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+logging.basicConfig(filename=f'logs/{int(time.time())}.log',
+                    level=logging.DEBUG, format=LOG_FORMAT)
 settings_data = parse_json_file('./settings.json')
 ENVIRONMENTS = settings_data['environments']
 USERNAME = settings_data['username']

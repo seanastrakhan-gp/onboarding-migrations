@@ -15,5 +15,5 @@
   },
   "username": "vladkochergin",
   "password": "12345678",
-  "env": "local"
+  "env": "dev"
 }

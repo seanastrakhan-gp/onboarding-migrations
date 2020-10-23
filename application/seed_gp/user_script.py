@@ -1,11 +1,13 @@
 import click
 import os
+import logging
 from settings import ENVIRONMENTS
 from application.services.authenticate import authenticate
 from application.services.create_user import create_staff
 from .user_factory import generate_users
 from application.settings import USERNAME, PASSWORD
 
+logger = logging.getLogger('__name__')
 
 @click.command()
 @click.option('--environment', default="local", help='Environment to seed (Dev, Staging, etc)')
