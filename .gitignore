@@ -31,5 +31,5 @@ htmlcov/
 *coverage
 .coverage
 .vscode
-/settings.json
+settings.json
 
