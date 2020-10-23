@@ -32,4 +32,5 @@ htmlcov/
 .coverage
 .vscode
 settings.json
+Pipfile.lock
 
