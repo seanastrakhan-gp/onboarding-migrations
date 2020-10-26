@@ -7,7 +7,9 @@ TOKEN_CACHE_KEY = 'auth_token'
 
 
 def set_new_auth():
-    cache[TOKEN_CACHE_KEY] = authenticate(USERNAME, PASSWORD)
+    token = authenticate(USERNAME, PASSWORD)
+    cache[TOKEN_CACHE_KEY] = token
+    return token
 
 
 def get_role():
@@ -19,10 +21,10 @@ def get_role():
 
 
 def api_call(method, *args, **kwargs):
-    headers = kwargs.get('headers') or dict()
+    headers = kwargs.pop('headers', dict()) or dict()
     token = cache.get(TOKEN_CACHE_KEY)
-    headers['Authorization'] = {'Authorization': f"Bearer {token}"}
-    return getattr(requests, method.lower())(*args, **kwargs)
+    headers['Authorization'] = f"Bearer {token}"
+    return getattr(requests, method.lower())(*args, headers=headers, **kwargs)
 
 
 def authorized_request(method, *args, **kwargs):

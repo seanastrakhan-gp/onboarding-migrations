@@ -40,12 +40,13 @@ def seed_staff(fake_users, org_id, bulk_file=None, **kwargs):
 
     # define method by user role
     if role == 'district':
-        data = bulk_upload_staff_district(users)
+        data = bulk_upload_staff_district(users).json()
     elif role == 'principal':
-        data = bulk_upload_staff_principal(users, org_id)
+        data = bulk_upload_staff_principal(users, org_id).json()
     else:
         logger.error('User should be district or principal')
         return
+
     logger.debug('Staff list added to the system')
     success_count = data.get('count')
     click.echo(f'{success_count} of {len(users)} users created')
