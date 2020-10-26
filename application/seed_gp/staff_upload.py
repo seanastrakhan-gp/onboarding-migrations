@@ -3,10 +3,11 @@ import os
 import logging
 from application.utils.csv import parse_bulk_file
 from application.settings import STAFF_BULK_PARAMS
-from application.services.authenticate import authenticate, get_role
+from application.services.api import set_new_auth
+from application.services.api import get_role
 from application.services.create_user import (
     bulk_upload_staff_district, bulk_upload_staff_principal)
-from application.seed_gp.user_factory import generate_users
+from application.seed_gp.user_factory import generate_staff
 from application.settings import USERNAME, PASSWORD
 
 
@@ -21,27 +22,27 @@ def seed_staff(fake_users, org_id, bulk_file=None, **kwargs):
     """
     Seed Staff with mock data
     """
-    auth_token = authenticate(USERNAME, PASSWORD)
     users = []
+    set_new_auth()
 
     # generating fake users
-    fake_users = generate_users(fake_users)
+    fake_users = generate_staff(fake_users)
     if fake_users:
         users += fake_users
-    logger.debug('Start staff upload')
+    logger.info('Start staff upload')
     if bulk_file:
         bulk_users = parse_bulk_file(file=bulk_file, fields=STAFF_BULK_PARAMS)
         if bulk_users:
             users += bulk_users
 
     # getting user_role
-    role = get_role(auth_token)
+    role = get_role()
 
     # define method by user role
     if role == 'district':
-        data = bulk_upload_staff_district(users, auth_token)
+        data = bulk_upload_staff_district(users)
     elif role == 'principal':
-        data = bulk_upload_staff_principal(users, auth_token, org_id)
+        data = bulk_upload_staff_principal(users, org_id)
     else:
         logger.error('User should be district or principal')
         return

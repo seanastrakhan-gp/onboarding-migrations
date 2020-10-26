@@ -27,7 +27,11 @@ class User:
 
 
 
-def generate_users(count):
-  TEACHER_GROUP_ID = 3
-  users = [User(index, staff_role_id=TEACHER_GROUP_ID).__dict__ for index in range(count)]
-  return users
+def generate_staff(count):
+    TEACHER_GROUP_ID = 3
+    users = [User(index, staff_role_id=TEACHER_GROUP_ID).__dict__ for index in range(count)]
+    return users
+
+def generate_students(count):
+    users = [User(index).__dict__ for index in range(count)]
+    return users

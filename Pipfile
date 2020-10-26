@@ -23,6 +23,7 @@ jmespath = "*"
 requests = "*"
 faker = "*"
 pandas = "*"
+diskcache = "*"
 
 [requires]
 python_version = "3.7"
