@@ -24,6 +24,7 @@ requests = "*"
 faker = "*"
 python-slugify = "*"
 pandas = "*"
+diskcache = "*"
 
 [requires]
 python_version = "3.7"

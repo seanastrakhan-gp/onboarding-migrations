@@ -44,6 +44,17 @@ def generate_users(count, role=TEACHER_ID):
   users = [User(index, staff_role_id=role) for index in range(count)]
   return users
 
+<<<<<<< HEAD
 def generate_schools(count):
   schools = [School(index) for index in range(count)]
   return schools
+=======
+def generate_staff(count):
+    TEACHER_GROUP_ID = 3
+    users = [User(index, staff_role_id=TEACHER_GROUP_ID).__dict__ for index in range(count)]
+    return users
+
+def generate_students(count):
+    users = [User(index).__dict__ for index in range(count)]
+    return users
+>>>>>>> 89968411a6017a0507db7cc47f421a39befd3de9
