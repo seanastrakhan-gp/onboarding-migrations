@@ -38,7 +38,7 @@ def seed_schools(environment, school_count):
 @click.option('--environment', default="local", help='Environment to seed (Dev, Staging, etc)')
 @click.option('--user_count', default=100, help='Amount of users to create')
 @click.option('--org_id', default=1222, help='Organization Id to associate User with')
-def seed_users(environment, user_count, org_id):
+def seed_org_users(environment, user_count, org_id):
     """
     Seed Staff with mock data
     """
@@ -52,20 +52,27 @@ def seed_users(environment, user_count, org_id):
 
 @click.command()
 @click.option('--environment', default="local", help='Environment to seed (Dev, Staging, etc)')
-@click.option('--user_count', default=3300, help='Amount of users to create')
+@click.option('--user_count', default=2900, help='Amount of users to create')
 @click.option('--increment_amount', default=5, help='Amount to create at a time')
-@click.option('--org_id', default=1224, help='Organization Id to associate User with')
-def seed_users_bulk(environment, user_count, increment_amount, org_id):
+def seed_district_users_bulk(environment, user_count, increment_amount):
     """
-    Seed Staff with mock data
+    Seed District Staff with mock data
     """
     environment_url = ENVIRONMENTS[environment]['host']
     auth_token = authenticate(USERNAME, PASSWORD)
     iterations = int(user_count / increment_amount)
+    staff_start = 25 
+    staff_end = 42
+    staff_curr = staff_start
+
     total_ran = 0
 
     for iteration in range(iterations):
-        users = generate_users(increment_amount)
+        users = generate_users(increment_amount, staff_curr)
+        staff_curr += 1
+        if staff_curr > staff_end:
+            staff_curr = staff_start
+
         response = bulk_upload_staff_district(users, auth_token)
         if response.status_code == 401:
             auth_token = authenticate(USERNAME, PASSWORD)
@@ -123,7 +130,7 @@ def seed_students(environment, user_count, org_id):
     click.echo(f'Process complete')
 
 if __name__ == '__main__':
-    #seed_users_bulk()
-    # seed_users()
-    seed_students()
+    seed_district_users_bulk()
+    # seed_org_users()
+    # seed_students()
     # seed_schools()

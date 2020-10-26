@@ -43,8 +43,8 @@ class User:
   def email(self):
     return f"{self.username}@mailinator.com"
 
-def generate_users(count, role=3, role_name="Teacher"):
-  users = [User(index, staff_role_id=role, staff_role_name=role_name) for index in range(count)]
+def generate_users(count, role=3):
+  users = [User(index, staff_role_id=role) for index in range(count)]
   return users
 
 def generate_schools(count):
