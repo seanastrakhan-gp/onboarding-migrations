@@ -1,31 +1,14 @@
 import requests
+import logging
 from jmespath import search
 from application.utils.csv import generate_csv
-from application.settings import ENV_HOST
+from application.settings import (ENV_HOST, STAFF_BULK_PARAMS)
+logger = logging.getLogger(__name__)
 
-STUDENT_BULK_REGISTRATION_PARAMS = (
-    'id',
-    'first_name',
-    'last_name',
-    'birthdate',
-    'gender',
-    'address',
-    'address_2',
-    'city',
-    'zipcode',
-    'country',
-)
 
-STAFF_BULK_PARAMS = (
-    'first_name',
-    'last_name',
-    'username',
-    'password',
-    'email',
-    'mobile',
-    'staff_role_name',
-    'staff_role'
-)
+def log_upload(payload):
+    for line in payload.split('\n'):
+        logging.debug(f'Payload row: {line}\n')
 
 def create_staff(payload, token, org_id):
     # maybe should go to a different URL
@@ -44,6 +27,8 @@ def bulk_upload_staff_district(payload, token):
     url = f"{ENV_HOST}/classes/district_staff/bulk/"
     auth_header = {'Authorization': f"Bearer {token}"}
     generated_file = generate_csv(payload, STAFF_BULK_PARAMS)
+    logger.debug(f'Writting users:')
+    log_upload(generated_file)
     response = requests.post(url, files=dict(roster=('roster.csv', generated_file)), headers=auth_header)
     return response.json()
 
@@ -51,5 +36,7 @@ def bulk_upload_staff_principal(payload, token, org_id):
     url = f"{ENV_HOST} "
     auth_header = {'Authorization': f"Bearer {token}"}
     generated_file = generate_csv(payload, STAFF_BULK_PARAMS)
+    logger.debug(f'Writting users:')
+    log_upload(generated_file)
     response = requests.post(url, files=dict(roster=('roster.csv', generated_file)), headers=auth_header)
     return response
