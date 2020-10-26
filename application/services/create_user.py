@@ -55,5 +55,5 @@ def bulk_upload_students(payload, org_id):
     log_upload(generated_file)
     response = authorized_request('post', url, files=dict(
         roster=('roster.csv', generated_file)))
-    return response.json()
+    return response
 
