@@ -33,4 +33,5 @@ htmlcov/
 .vscode
 settings.json
 Pipfile.lock
+logs/
 
