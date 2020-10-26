@@ -1,3 +1,4 @@
+import time
 from faker import Faker
 from slugify import slugify
 from datetime import datetime
@@ -5,6 +6,7 @@ import json
 
 
 faker = Faker()
+TEACHER_ID = 3
 class School:
   def __init__(self, index, **kwargs):
     self.description = f"School for people who want to be a {faker.job()}"
@@ -21,29 +23,24 @@ class School:
       return f"{self.org_name}{datetime.now()}@mailinator.com"
 
 class User:
+  DEFAULT_PASSWORD = '12345678'
   faker = Faker()
+
   def __init__(self, index, **kwargs):
+    # index should be first
+    self.index = str(int(time.time()))
     self.first_name = kwargs.get("first_name") or self.faker.first_name()
-    self.last_name = kwargs.get("last_name")  or self.faker.last_name()
-    self.index = index
+    self.last_name = kwargs.get("last_name") or self.faker.last_name()
     self.staff_role = kwargs.get("staff_role_id", None)
     self.staff_role_name = kwargs.get("staff_role_name", None)
     self.username = slugify(f"{self.first_name}{datetime.now()}",replacements=[["-", ""]])
-  # @property
-  # def username(self):
-  #   username =  slugify(f"{self.first_name}{datetime.now()}",replacements=[["-", ""]])
-  #   return username
-
-  @property
-  def password(self):
-    password =  "12345678"
-    return password
+    self.password = kwargs.get("password") or self.DEFAULT_PASSWORD
 
   @property
   def email(self):
     return f"{self.username}@mailinator.com"
 
-def generate_users(count, role=3):
+def generate_users(count, role=TEACHER_ID):
   users = [User(index, staff_role_id=role) for index in range(count)]
   return users
 

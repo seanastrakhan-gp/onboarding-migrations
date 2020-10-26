@@ -31,7 +31,6 @@ def seed_schools(environment, school_count):
         total_ran += 1
         click.echo(f'Ran {total_ran}.  Left: {school_count - total_ran}')
 
-
     click.echo(f'Process complete')
 
 @click.command()
@@ -40,7 +39,7 @@ def seed_schools(environment, school_count):
 @click.option('--org_id', default=1222, help='Organization Id to associate User with')
 def seed_org_users(environment, user_count, org_id):
     """
-    Seed Staff with mock data
+    Seed Org Staff with mock data
     """
     environment_url = ENVIRONMENTS[environment]['host']
     auth_token = authenticate(USERNAME, PASSWORD)
@@ -56,22 +55,24 @@ def seed_org_users(environment, user_count, org_id):
 @click.option('--increment_amount', default=5, help='Amount to create at a time')
 def seed_district_users_bulk(environment, user_count, increment_amount):
     """
-    Seed District Staff with mock data
+    Seed District Staff with mock data and random roles
     """
     environment_url = ENVIRONMENTS[environment]['host']
     auth_token = authenticate(USERNAME, PASSWORD)
     iterations = int(user_count / increment_amount)
-    staff_start = 25 
-    staff_end = 42
-    staff_curr = staff_start
+    # Range of Staff Roles that a District would use instead of assigning them all
+    # as default "Teacher"
+    staff_start_id = 25 
+    staff_end_id = 42
+    staff_current_id = staff_start_id
 
     total_ran = 0
 
     for iteration in range(iterations):
-        users = generate_users(increment_amount, staff_curr)
-        staff_curr += 1
-        if staff_curr > staff_end:
-            staff_curr = staff_start
+        users = generate_users(increment_amount, staff_current_id)
+        staff_current_id += 1
+        if staff_current_id > staff_end_id:
+            staff_current_id = staff_start_id
 
         response = bulk_upload_staff_district(users, auth_token)
         if response.status_code == 401:
@@ -91,18 +92,18 @@ def seed_district_users_bulk(environment, user_count, increment_amount):
 @click.option('--org_id', default=1224, help='Organization Id to associate User with')
 def seed_students(environment, user_count, org_id):
     """
-    Seed Students with mock data
+    Seed Students with mock data under multiple schools and multiple parents
     """
     environment_url = ENVIRONMENTS[environment]['host']
     auth_token = authenticate(USERNAME, PASSWORD)
     users = generate_users(user_count)
     total_ran = 0
 
-    school_begin = 373 # 306 - Sup_SmallDistrict
-    school_end = 816 # 367
+    school_begin = 373  # Refactor to make endpoint to GET all schools in above district
+    school_end = 816 
     school_curr = school_begin
 
-    parent_begin = 539741# Sup_SmallDistrict 508058
+    parent_begin = 539741
 
     for user in users:
         if total_ran % 20 == 0:
