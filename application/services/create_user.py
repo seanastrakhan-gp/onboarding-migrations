@@ -34,6 +34,12 @@ def create_staff(payload, token, org_id):
     response = requests.post(url, json=payload, headers=auth_header)
     return response
 
+def create_school(payload, token):
+    url = f"{ENV_HOST}/classes/organization/"
+    auth_header = {'Authorization': f"Bearer {token}"}
+    response = requests.post(url, json=payload, headers=auth_header)
+    return response
+
 def create_student(payload, token, org_id):
     url = f"{ENV_HOST}/classes/organization/{org_id}/student_user/"
     auth_header = {'Authorization': f"Bearer {token}"}
@@ -45,7 +51,7 @@ def bulk_upload_staff_district(payload, token):
     auth_header = {'Authorization': f"Bearer {token}"}
     generated_file = generate_csv(payload, STAFF_BULK_PARAMS)
     response = requests.post(url, files=dict(roster=('roster.csv', generated_file)), headers=auth_header)
-    return response.json()
+    return response
 
 def bulk_upload_staff_principal(payload, token, org_id):
     url = f"{ENV_HOST}/classes/organization/{org_id}/staff/bulk/"

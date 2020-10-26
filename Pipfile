@@ -22,6 +22,7 @@ click = "*"
 jmespath = "*"
 requests = "*"
 faker = "*"
+python-slugify = "*"
 
 [requires]
 python_version = "3.7"
