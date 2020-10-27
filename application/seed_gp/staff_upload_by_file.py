@@ -14,22 +14,19 @@ logger = logging.getLogger(__name__)
 ROOT_DIR = os.path.dirname(os.path.abspath(__file__))
 
 @click.command()
-@click.option('--fake_users', default=2, help='Amount of users to create')
 @click.option('--org_id', default=1, help='Organization Id to associate User with')
 @click.option('--bulk_file_name', default='test.csv', help='Path to bulk upload file')
-def seed_staff_from_file(fake_users, org_id, bulk_file_name, **kwargs):
+def seed_staff_from_file(org_id, bulk_file_name, **kwargs):
     """
     Migrate Staff data from file
     """
     file_path = f"{ROOT_DIR}/data_sources/{bulk_file_name}"
-    auth_token = authenticate(USERNAME, PASSWORD)
     users = []
-    set_new_auth()
 
     logger.debug('Start staff upload')
-    if bulk_file_name:
-        bulk_users = parse_bulk_file(file=file_path, fields=STAFF_BULK_PARAMS)
-        if bulk_users:
+    bulk_users = parse_bulk_file(file=file_path, fields=STAFF_BULK_PARAMS)
+    
+    if bulk_users:
             users += bulk_users
     else:
         raise Exception('Bulk file Missing')
@@ -39,9 +36,9 @@ def seed_staff_from_file(fake_users, org_id, bulk_file_name, **kwargs):
 
     # define method by user role and rerun if expired
     if role == 'district':
-        data = bulk_upload_staff_district(users)
+        response = bulk_upload_staff_district(users)
     elif role == 'principal':
-        data = bulk_upload_staff_principal(users, org_id)
+        response = bulk_upload_staff_principal(users, org_id)
     else:
         logger.error('User should be district or principal')
         return

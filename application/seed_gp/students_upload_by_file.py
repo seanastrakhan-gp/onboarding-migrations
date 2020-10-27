@@ -39,7 +39,7 @@ def seed_students(fake_users, org_id, bulk_file=None, chunk_size=None, **kwargs)
         start = chunk_num+1
         end = start + chunk_size
         logger.info(f'Writing users {start} to {end} of {users_count}')
-        data = bulk_upload_students(chunk, org_id)
+        data = bulk_upload_students(chunk, org_id).json()
         success_count += data and len(data) or 0
 
     logger.info(f'{success_count} of {users_count} users created')

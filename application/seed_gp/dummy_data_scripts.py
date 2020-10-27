@@ -1,10 +1,16 @@
 import click
 import os
 import logging
+import asyncio
+import time
 from application.services.authenticate import authenticate
-from application.services.create_user import create_staff, bulk_upload_staff_principal, create_student, create_school, bulk_upload_staff_district
+from application.services.create_user import create_staff, bulk_upload_staff_principal, \
+create_student, create_school, bulk_upload_staff_district, bulk_upload_students
+from application.services.crete_user_async import post_async_student, test_async, process_users
 from application.seed_gp.user_factory import generate_users, generate_schools
 from application.settings import USERNAME, PASSWORD, ENVIRONMENTS
+from application.utils.csv import parse_bulk_file
+from application.utils.chunks import chunks
 
 logger = logging.getLogger('__name__')
 
@@ -86,11 +92,18 @@ def seed_district_users_bulk(environment, user_count, increment_amount):
 
     click.echo(f'Process complete')
 
+
+async def print_when_done(tasks):
+    for res in asyncio.as_completed(tasks):
+        print(f"Result {await res}")
+
 @click.command()
 @click.option('--environment', default="local", help='Environment to seed (Dev, Staging, etc)')
-@click.option('--user_count', default=30000, help='Amount of users to create')
+@click.option('--user_count', default=10, help='Amount of users to create')
 @click.option('--org_id', default=1224, help='Organization Id to associate User with')
-def seed_students(environment, user_count, org_id):
+@click.option('--chunk_size', default=5, help='Bulk upload items size')
+
+def seed_students(environment, user_count, org_id, chunk_size):
     """
     Seed Students with mock data under multiple schools and multiple parents
     """
@@ -105,33 +118,75 @@ def seed_students(environment, user_count, org_id):
 
     parent_begin = 539741
 
-    for user in users:
-        if total_ran % 20 == 0:
-            click.echo(f'Creating Parent - Total Ran {total_ran}')
-            users = generate_users(2, 4, "Parent")
-            parent_json = users[0].__dict__ 
-            parent_response = create_staff(parent_json, auth_token, school_curr)
-            parent_begin = parent_begin + total_ran + 1
+    [setattr(student,'parent_id',[parent_begin]) for student in users]
+    users = [student.__dict__ for student in users]
+    index = 0 
 
-        user_json = user.__dict__
-        user_json["parent_id"] = [parent_begin]
-        response = create_student(user_json, auth_token, school_curr)
-        if response.status_code == 401:
-            auth_token = authenticate(USERNAME, PASSWORD)
-            click.echo(f'Whoops Token expired or auth issue, trying again')
-            response = create_student(user_json, auth_token, school_curr)
-    
-        click.echo(f'Iteration {user}.  Result: {response.content}')
-        total_ran += 1
+    start = time.perf_counter()
+    while index < len(users):
+        ## Sync Run
+        # response = create_student(users[index], school_curr, index)
+        # print('Response content', response)
+        # index += 1
+
+        users_to_upload = users[index: index + chunk_size]
+
+        ## Async standard
+        #coros = [create_student(users[i], school_curr, i) for i in range(index, index + chunk_size)]
+        # asyncio.get_event_loop().run_until_complete(test_async(school_curr, auth_token, users_to_upload, index))
+
+        # async gather
+        loop = asyncio.get_event_loop()
+        loop.run_until_complete(process_users(users_to_upload, school_curr, auth_token, index))
+        # Async Futures
+        # futures = []
+        # for u in users_to_upload:
+        #     futures.append(post_async_student(school_curr, auth_token, u, index))   
+        # loop = asyncio.get_event_loop()
+        # loop.run_until_complete(asyncio.wait(futures))
+        
+        index += chunk_size
+
         school_curr += 1
         if school_curr > school_end:
             school_curr = school_begin
-        click.echo(f'Ran {total_ran}.  Left: {user_count - total_ran} School Id: {school_curr}')
+        click.echo(f'Loop {index} done')
+    loop.close()
+    end = time.perf_counter() - start
 
-    click.echo(f'Process complete')
+    click.echo(f'Process complete (took {end:0.2f} seconds)')
+
+
+    # for user in users:
+    #     # if total_ran % 20 == 0:
+    #     #     click.echo(f'Creating Parent - Total Ran {total_ran}')
+    #     #     users = generate_users(2, 4, "Parent")
+    #     #     parent_json = users[0].__dict__ 
+    #     #     parent_response = create_staff(parent_json, auth_token, school_curr)
+    #     #     parent_begin = parent_begin + total_ran + 1
+
+    #     user_json = user.__dict__
+    #     user_json["parent_id"] = [parent_begin]
+    #     group1 = create_student(user_json, auth_token, school_curr)
+    #     coros = [create_student(user_json, auth_token, school_curr)
+
+
+    #     several_futures = asyncio.gather(
+    #         mycoro(1), mycoro(2), mycoro(3))
+
+    #     # response = create_student(user_json, auth_token, school_curr)
+    
+    #     click.echo(f'Iteration {user}.  Result: {response.content}')
+    #     total_ran += 1
+    #     school_curr += 1
+    #     if school_curr > school_end:
+    #         school_curr = school_begin
+    #     click.echo(f'Ran {total_ran}.  Left: {user_count - total_ran} School Id: {school_curr}')
+
+    # click.echo(f'Process complete')
 
 if __name__ == '__main__':
-    seed_district_users_bulk()
+    # seed_district_users_bulk()
     # seed_org_users()
-    # seed_students()
+    seed_students()
     # seed_schools()

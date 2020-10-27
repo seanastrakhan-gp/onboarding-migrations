@@ -25,6 +25,9 @@ faker = "*"
 python-slugify = "*"
 pandas = "*"
 diskcache = "*"
+aiohttp = "*"
+aiofiles = "*"
+aiohttp-requests = "*"
 
 [requires]
 python_version = "3.7"

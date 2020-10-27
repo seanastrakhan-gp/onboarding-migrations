@@ -5,7 +5,6 @@ import sys
 import diskcache as dc
 
 STUDENT_BULK_REGISTRATION_PARAMS = (
-    'id',
     'first_name',
     'last_name',
     'birthdate',
