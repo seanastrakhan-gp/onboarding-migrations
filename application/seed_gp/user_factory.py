@@ -36,10 +36,14 @@ class User:
     self.username = slugify(f"{self.first_name}{datetime.now()}",replacements=[["-", ""]])
     self.password = kwargs.get("password") or self.DEFAULT_PASSWORD
     self.parent_id = None
+    self.email = f"{self.username}@mailinator.com"
 
-  @property
-  def email(self):
-    return f"{self.username}@mailinator.com"
+  # @property
+  # def email(self):
+  #   return f"{self.username}@mailinator.com"
+
+  # def generate_un(self):
+        
 
 def generate_users(count, role=TEACHER_ID):
   users = [User(index, staff_role_id=role) for index in range(count)]

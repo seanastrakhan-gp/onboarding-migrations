@@ -64,4 +64,3 @@ def bulk_upload_students(payload, org_id):
     response = authorized_request('post', url, files=dict(
         roster=('roster.csv', generated_file)))
     return response
-

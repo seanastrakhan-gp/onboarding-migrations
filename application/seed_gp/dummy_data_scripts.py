@@ -3,6 +3,7 @@ import os
 import logging
 import asyncio
 import time
+from multiprocessing import Pool
 from application.services.authenticate import authenticate
 from application.services.create_user import create_staff, bulk_upload_staff_principal, \
 create_student, create_school, bulk_upload_staff_district, bulk_upload_students
@@ -76,11 +77,13 @@ def seed_district_users_bulk(environment, user_count, increment_amount):
 
     for iteration in range(iterations):
         users = generate_users(increment_amount, staff_current_id)
+        users = [staff.__dict__ for staff in users]
+
         staff_current_id += 1
         if staff_current_id > staff_end_id:
             staff_current_id = staff_start_id
 
-        response = bulk_upload_staff_district(users, auth_token)
+        response = bulk_upload_staff_district(users)
         if response.status_code == 401:
             auth_token = authenticate(USERNAME, PASSWORD)
             click.echo(f'Whoops Token expired or auth issue, trying again')
@@ -97,11 +100,14 @@ async def print_when_done(tasks):
     for res in asyncio.as_completed(tasks):
         print(f"Result {await res}")
 
+def multi_run_wrapper(args):
+       return create_student(*args)
+
 @click.command()
 @click.option('--environment', default="local", help='Environment to seed (Dev, Staging, etc)')
-@click.option('--user_count', default=10, help='Amount of users to create')
+@click.option('--user_count', default=12, help='Amount of users to create')
 @click.option('--org_id', default=1224, help='Organization Id to associate User with')
-@click.option('--chunk_size', default=5, help='Bulk upload items size')
+@click.option('--chunk_size', default=3, help='Bulk upload items size')
 
 def seed_students(environment, user_count, org_id, chunk_size):
     """
@@ -128,16 +134,30 @@ def seed_students(environment, user_count, org_id, chunk_size):
         # response = create_student(users[index], school_curr, index)
         # print('Response content', response)
         # index += 1
+        usrs = users[index: index + chunk_size]
+        print('USERS', usrs)
+        # POOL
+        # # pool.map(create_student, range(chunk_size))
+        pool = Pool()
+        contents_to_upload = [
+            (usrs[0], school_curr,index),
+            (usrs[1],school_curr,index+1),
+            (usrs[2],school_curr,index+2)
+        ]
+        results = pool.map(multi_run_wrapper,contents_to_upload)
 
-        users_to_upload = users[index: index + chunk_size]
+        pool.close()
+        pool.join()
+        click.echo(f'Ran {results}.  Left: {len(users) - index} Index Id: {index}')
 
         ## Async standard
         #coros = [create_student(users[i], school_curr, i) for i in range(index, index + chunk_size)]
         # asyncio.get_event_loop().run_until_complete(test_async(school_curr, auth_token, users_to_upload, index))
 
         # async gather
-        loop = asyncio.get_event_loop()
-        loop.run_until_complete(process_users(users_to_upload, school_curr, auth_token, index))
+        # loop = asyncio.get_event_loop()
+        # loop.run_until_complete(process_users(users_to_upload, school_curr, auth_token, index))
+        
         # Async Futures
         # futures = []
         # for u in users_to_upload:
@@ -151,7 +171,7 @@ def seed_students(environment, user_count, org_id, chunk_size):
         if school_curr > school_end:
             school_curr = school_begin
         click.echo(f'Loop {index} done')
-    loop.close()
+    # loop.close()
     end = time.perf_counter() - start
 
     click.echo(f'Process complete (took {end:0.2f} seconds)')
@@ -167,12 +187,6 @@ def seed_students(environment, user_count, org_id, chunk_size):
 
     #     user_json = user.__dict__
     #     user_json["parent_id"] = [parent_begin]
-    #     group1 = create_student(user_json, auth_token, school_curr)
-    #     coros = [create_student(user_json, auth_token, school_curr)
-
-
-    #     several_futures = asyncio.gather(
-    #         mycoro(1), mycoro(2), mycoro(3))
 
     #     # response = create_student(user_json, auth_token, school_curr)
     
@@ -186,7 +200,7 @@ def seed_students(environment, user_count, org_id, chunk_size):
     # click.echo(f'Process complete')
 
 if __name__ == '__main__':
-    # seed_district_users_bulk()
+    seed_district_users_bulk()
     # seed_org_users()
-    seed_students()
+    # seed_students()
     # seed_schools()
