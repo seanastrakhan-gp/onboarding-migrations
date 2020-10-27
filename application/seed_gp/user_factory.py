@@ -37,12 +37,6 @@ class User:
     self.password = kwargs.get("password") or self.DEFAULT_PASSWORD
     self.parent_id = None
     self.email = f"{self.username}@mailinator.com"
-
-  # @property
-  # def email(self):
-  #   return f"{self.username}@mailinator.com"
-
-  # def generate_un(self):
         
 
 def generate_users(count, role=TEACHER_ID):

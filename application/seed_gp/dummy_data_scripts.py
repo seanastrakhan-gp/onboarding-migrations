@@ -112,6 +112,7 @@ def multi_run_wrapper(args):
 def seed_students(environment, user_count, org_id, chunk_size):
     """
     Seed Students with mock data under multiple schools and multiple parents
+    All the commented out code is different attempts at async
     """
     environment_url = ENVIRONMENTS[environment]['host']
     auth_token = authenticate(USERNAME, PASSWORD)
@@ -134,8 +135,8 @@ def seed_students(environment, user_count, org_id, chunk_size):
         # response = create_student(users[index], school_curr, index)
         # print('Response content', response)
         # index += 1
+
         usrs = users[index: index + chunk_size]
-        print('USERS', usrs)
         # POOL
         # # pool.map(create_student, range(chunk_size))
         pool = Pool()
@@ -154,7 +155,7 @@ def seed_students(environment, user_count, org_id, chunk_size):
         #coros = [create_student(users[i], school_curr, i) for i in range(index, index + chunk_size)]
         # asyncio.get_event_loop().run_until_complete(test_async(school_curr, auth_token, users_to_upload, index))
 
-        # async gather
+        # Async gather
         # loop = asyncio.get_event_loop()
         # loop.run_until_complete(process_users(users_to_upload, school_curr, auth_token, index))
         
@@ -170,37 +171,13 @@ def seed_students(environment, user_count, org_id, chunk_size):
         school_curr += 1
         if school_curr > school_end:
             school_curr = school_begin
-        click.echo(f'Loop {index} done')
     # loop.close()
     end = time.perf_counter() - start
 
     click.echo(f'Process complete (took {end:0.2f} seconds)')
 
-
-    # for user in users:
-    #     # if total_ran % 20 == 0:
-    #     #     click.echo(f'Creating Parent - Total Ran {total_ran}')
-    #     #     users = generate_users(2, 4, "Parent")
-    #     #     parent_json = users[0].__dict__ 
-    #     #     parent_response = create_staff(parent_json, auth_token, school_curr)
-    #     #     parent_begin = parent_begin + total_ran + 1
-
-    #     user_json = user.__dict__
-    #     user_json["parent_id"] = [parent_begin]
-
-    #     # response = create_student(user_json, auth_token, school_curr)
-    
-    #     click.echo(f'Iteration {user}.  Result: {response.content}')
-    #     total_ran += 1
-    #     school_curr += 1
-    #     if school_curr > school_end:
-    #         school_curr = school_begin
-    #     click.echo(f'Ran {total_ran}.  Left: {user_count - total_ran} School Id: {school_curr}')
-
-    # click.echo(f'Process complete')
-
 if __name__ == '__main__':
     seed_district_users_bulk()
     # seed_org_users()
-    # seed_students()
+    seed_students()
     # seed_schools()
